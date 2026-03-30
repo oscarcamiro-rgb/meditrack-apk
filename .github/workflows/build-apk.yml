@@ -2,36 +2,36 @@ name: Build MediTrack APK
 
 on:
   push:
-      branches: [main]
-        workflow_dispatch:
+    branches: [main]
+  workflow_dispatch:
 
-        jobs:
-          build:
-              runs-on: ubuntu-latest
-                  steps:
-                        - name: Setup Java 17
-                                uses: actions/setup-java@v4
-                                        with:
-                                                  java-version: '17'
-                                                            distribution: 'temurin'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
 
-                                                                  - name: Install Bubblewrap CLI
-                                                                          run: npm install -g @bubblewrap/cli
+      - name: Install Bubblewrap CLI
+        run: npm install -g @bubblewrap/cli
 
-                                                                                - name: Init and Build TWA
-                                                                                        env:
-                                                                                                  ANDROID_HOME: /usr/local/lib/android/sdk
-                                                                                                          run: |
-                                                                                                                    mkdir apk-build && cd apk-build
-                                                                                                                              yes "" | bubblewrap init --manifest="https://meditrack-borinots-v1-02.netlify.app/manifest.json" || true
-                                                                                                                                        node -e "const fs=require('fs');const m=JSON.parse(fs.readFileSync('twa-manifest.json','utf8'));m.packageId='com.meditrack.app';m.signingMode='new';m.signing={alias:'meditrack-key',fullName:'MediTrack',organization:'MediTrack',organizationalUnit:'App',countryCode:'ES',keyPassword:'MediTrack2024!',storePassword:'MediTrack2024!',file:null};fs.writeFileSync('twa-manifest.json',JSON.stringify(m,null,2));console.log('Updated');"
-                                                                                                                                                  bubblewrap build
-                                                                                                                                                  
-                                                                                                                                                        - name: Upload APK
-                                                                                                                                                                uses: actions/upload-artifact@v4
-                                                                                                                                                                        with:
-                                                                                                                                                                                  name: meditrack-apk
-                                                                                                                                                                                            path: |
-                                                                                                                                                                                                        apk-build/app-release-signed.apk
-                                                                                                                                                                                                                    apk-build/app-release.aab
-                                                                                                                                                                                                                              if-no-files-found: warn
+      - name: Init and Build TWA
+        env:
+          ANDROID_HOME: /usr/local/lib/android/sdk
+        run: |
+          mkdir apk-build && cd apk-build
+          yes "" | bubblewrap init --manifest="https://meditrack-borinots-v1-02.netlify.app/manifest.json" || true
+          node -e "const fs=require('fs');const m=JSON.parse(fs.readFileSync('twa-manifest.json','utf8'));m.packageId='com.meditrack.app';m.signingMode='new';m.signing={alias:'meditrack-key',fullName:'MediTrack',organization:'MediTrack',organizationalUnit:'App',countryCode:'ES',keyPassword:'MediTrack2024!',storePassword:'MediTrack2024!',file:null};fs.writeFileSync('twa-manifest.json',JSON.stringify(m,null,2));console.log('Updated');"
+          bubblewrap build
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: meditrack-apk
+          path: |
+            apk-build/app-release-signed.apk
+            apk-build/app-release.aab
+          if-no-files-found: warn
