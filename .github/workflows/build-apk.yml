@@ -23,7 +23,9 @@ jobs:
           ANDROID_HOME: /usr/local/lib/android/sdk
         run: |
           mkdir apk-build && cd apk-build
-          yes "" | bubblewrap init --manifest="https://meditrack-borinots-v1-02.netlify.app/manifest.json" || true
+          mkdir -p "$HOME/.bubblewrap"
+          echo "{\"jdkPath\":\"$JAVA_HOME\",\"androidSdkPath\":\"$ANDROID_HOME\"}" > "$HOME/.bubblewrap/config.json"
+          yes "y" | bubblewrap init --manifest="https://meditrack-borinots-v1-02.netlify.app/manifest.json" || true
           node -e "const fs=require('fs');const m=JSON.parse(fs.readFileSync('twa-manifest.json','utf8'));m.packageId='com.meditrack.app';m.signingMode='new';m.signing={alias:'meditrack-key',fullName:'MediTrack',organization:'MediTrack',organizationalUnit:'App',countryCode:'ES',keyPassword:'MediTrack2024!',storePassword:'MediTrack2024!',file:null};fs.writeFileSync('twa-manifest.json',JSON.stringify(m,null,2));console.log('Updated');"
           bubblewrap build
 
