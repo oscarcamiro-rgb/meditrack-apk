@@ -26,19 +26,12 @@ jobs:
 
       - name: Build TWA APK
         run: |
-          echo "=== SDK Debug ==="
-          echo "ANDROID_HOME=$ANDROID_HOME"
-          echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT"
-          ls "$ANDROID_HOME/cmdline-tools/" 2>/dev/null || echo "no cmdline-tools dir"
-          ls "$ANDROID_HOME/cmdline-tools/latest/bin/" 2>/dev/null || echo "no latest/bin!"
-          node -e "const fs=require('fs'),p=(process.env.ANDROID_HOME||process.env.ANDROID_SDK_ROOT||'')+'/cmdline-tools/latest/bin/sdkmanager';console.log('sdkmanager node check:',fs.existsSync(p),'at:',p);"
-          echo "=== Building ==="
           mkdir apk-build && cd apk-build
           mkdir -p "$HOME/.bubblewrap"
-          node -e "const sdk=process.env.ANDROID_HOME||process.env.ANDROID_SDK_ROOT;require('fs').writeFileSync(process.env.HOME+'/.bubblewrap/config.json',JSON.stringify({jdkPath:process.env.JAVA_HOME,androidSdkPath:sdk}));console.log('config written with androidSdkPath:',sdk);"
+          node -e "const sdk=process.env.ANDROID_HOME||process.env.ANDROID_SDK_ROOT;require('fs').writeFileSync(process.env.HOME+'/.bubblewrap/config.json',JSON.stringify({jdkPath:process.env.JAVA_HOME,androidSdkPath:sdk}));"
           echo "Config: $(cat $HOME/.bubblewrap/config.json)"
           node -e "require('fs').writeFileSync('twa-manifest.json',JSON.stringify({packageId:'com.meditrack.app',host:'meditrack-borinots-v1-02.netlify.app',name:'MediTrack',launcherName:'MediTrack',display:'standalone',orientation:'portrait',themeColor:'#0a1628',navigationColor:'#0a1628',navigationColorDark:'#0a1628',navigationDividerColor:'#0a1628',navigationDividerColorDark:'#0a1628',backgroundColor:'#0a1628',enableNotifications:false,startUrl:'/',iconUrl:'https://meditrack-borinots-v1-02.netlify.app/icon-512.png',maskableIconUrl:'https://meditrack-borinots-v1-02.netlify.app/icon-512.png',monochromeIconUrl:null,splashScreenFadeOutDuration:300,signingMode:'new',signing:{alias:'meditrack-key',fullName:'MediTrack',organization:'MediTrack',organizationalUnit:'App',countryCode:'ES',keyPassword:'MediTrack2024!',storePassword:'MediTrack2024!',file:null},appVersion:'1',appVersionName:'1.0.0',shortName:'MediTrack',generatorApp:'bubblewrap-cli',webManifestUrl:'https://meditrack-borinots-v1-02.netlify.app/manifest.json',isChromeOSOnly:false,isMetaQuest:false,minSdkVersion:19,targetSdkVersion:32,fingerprints:[],shortcuts:[],features:{locationDelegation:{enabled:true},playBilling:{enabled:false}},alphaDependencies:{enabled:false},enableSiteSettingsShortcut:true,isSplashScreenEnabled:true,isIconMaskable:true,fullScopeUrl:'https://meditrack-borinots-v1-02.netlify.app/',rotationEnabled:false,serviceAccountJsonFile:null,fallbackType:'customtabs',additionalTrustedOrigins:[],retainedBundles:[],ratingDelegation:false},null,2));console.log('twa-manifest.json created');"
-          bubblewrap build
+          echo "y" | bubblewrap build
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
